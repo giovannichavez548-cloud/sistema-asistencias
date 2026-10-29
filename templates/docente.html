@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Docente - Asistencias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container container-docente">
+        <div class="card">
+            <a href="/docente/logout" class="back-link" style="float: left;">← Cerrar Sesión</a>
+            <div style="clear: both;"></div>
+            <h2>PANEL DE CONTROL DOCENTE / ORIENTACIÓN</h2>
+            <p style="text-align: center; color: #a39e93;">Seleccione el grupo y busque por número de lista</p>
+            
+            <form method="POST" style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; flex-wrap: wrap; background: #0b0b0b; padding: 15px; border-radius: 8px; border: 1px solid #202020; align-items: flex-end;">
+                <div>
+                    <label>Área / Materia</label>
+                    <input type="text" value="{{ asignatura }}" readonly style="opacity: 0.7;">
+                </div>
+                <div>
+                    <label>Seleccionar Grupo</label>
+                    <select name="grupo" onchange="this.form.submit()">
+                        {% for g in grupos %}
+                            <option value="{{ g }}" {% if g == grupo_actual %}selected{% endif %}>Grupo {{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Buscar N° de Lista</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="number" name="busqueda_lista" value="{{ busqueda_lista }}" min="1" max="50" placeholder="Ej. 1" style="width: 90px;">
+                        <button type="submit" class="btn btn-primary" style="padding: 10px 15px; margin: 0; width: auto;">Buscar</button>
+                    </div>
+                </div>
+            </form>
+
+            <div style="font-size: 14px; color: #f4efe6; margin-bottom: 15px; text-align: left; display: flex; justify-content: space-between;">
+                <span>Grupo seleccionado: <span style="color: #a39e93;">{{ grupo_actual }}</span></span>
+                {% if busqueda_lista %}
+                    <a href="/docente/panel?grupo={{ grupo_actual }}" style="color: #e8a4a4; font-size: 12px; text-decoration: none;">[Limpiar búsqueda]</a>
+                {% endif %}
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>N° Lista</th>
+                        <th>Matrícula</th>
+                        <th>Nombre del Alumno</th>
+                        <th>Estado</th>
+                        <th>Última Asistencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alumno in alumnos %}
+                    <tr>
+                        <td style="font-weight: bold; color: #f4efe6;">{{ alumno.numero_lista }}</td>
+                        <td>{{ alumno.matricula }}</td>
+                        <td>{{ alumno.nombre }}</td>
+                        <td>
+                            {% if alumno.total_asistencias > 0 %}
+                                <span class="badge-asistio">Presente ({{ alumno.total_asistencias }})</span>
+                            {% else %}
+                                <span class="badge-falta">Sin Registro</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if alumno.ultima_fecha %}
+                                {{ alumno.ultima_fecha }} a las {{ alumno.ultima_hora }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #a39e93; padding: 30px;">No se encontraron alumnos registrados con ese criterio en este grupo.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

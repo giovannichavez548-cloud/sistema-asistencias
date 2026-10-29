@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escáner de Asistencias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 600px;">
+        <div class="card">
+            <h2>ESCÁNER DE CREDENCIALES</h2>
+            <p>Coloca el código QR frente a la cámara del dispositivo.</p>
+            
+            <!-- Botón para activar la cámara de forma segura -->
+            <button id="btn-activar" class="btn btn-primary" onclick="iniciarCamara()" style="margin-bottom: 15px;">Activar Cámara</button>
+
+            <!-- Contenedor donde se mostrará la cámara -->
+            <div id="reader" style="width: 100%; border-radius: 8px; background: #0b0b0b; border: 1px solid #262626; overflow: hidden; display: none;"></div>
+            
+            <div id="alerta" style="margin-top: 20px; padding: 14px; border-radius: 8px; display: none; font-weight: 500; font-size: 14px; letter-spacing: 0.5px;"></div>
+            
+            <a href="/admin/logout" class="back-link" style="margin-top: 25px; display: block; color: #e8a4a4;">Cerrar Sesión Administrador</a>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+        let bloqueado = false;
+        let html5QrCode = null;
+
+        function onScanSuccess(decodedText) {
+            if (bloqueado) return;
+            bloqueado = true;
+            const alerta = document.getElementById('alerta');
+            alerta.style.display = 'block';
+            alerta.className = '';
+            alerta.innerText = 'Procesando...';
+
+            fetch('/api/registrar-asistencia', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ qr_data: decodedText })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alerta.style.background = '#132219';
+                    alerta.style.color = '#b4e6c8';
+                    alerta.style.border = '1px solid #1e3827';
+                    alerta.innerHTML = `✓ Asistencia registrada<br><strong style="font-size: 15px; display: block; margin-top: 4px;">${data.alumno.nombre}</strong> <span style="font-size: 12px; color: #8cb89d;">(${data.alumno.hora})</span>`;
+                } else {
+                    alerta.style.background = '#261414';
+                    alerta.style.color = '#e8a4a4';
+                    alerta.style.border = '1px solid #3d2222';
+                    alerta.innerHTML = `✕ ${data.message}`;
+                }
+                setTimeout(() => { bloqueado = false; alerta.style.display = 'none'; }, 3500);
+            })
+            .catch(() => {
+                alerta.style.background = '#261414';
+                alerta.style.color = '#e8a4a4';
+                alerta.style.border = '1px solid #3d2222';
+                alerta.innerText = 'Error de conexión con el servidor.';
+                setTimeout(() => { bloqueado = false; }, 3500);
+            });
+        }
+
+        function iniciarCamara() {
+            document.getElementById('btn-activar').style.display = 'none';
+            document.getElementById('reader').style.display = 'block';
+            
+            html5QrCode = new Html5Qrcode("reader");
+            Html5Qrcode.getCameras().then(devices => {
+                if (devices && devices.length) {
+                    let cameraId = devices.length > 1 ? devices[devices.length - 1].id : devices[0].id;
+                    html5QrCode.start(
+                        cameraId, 
+                        { fps: 10, qrbox: { width: 240, height: 240 } },
+                        onScanSuccess
+                    ).catch(err => { 
+                        alert("No se pudo iniciar la cámara. Revisa los permisos."); 
+                        document.getElementById('btn-activar').style.display = 'block';
+                    });
+                } else {
+                    alert("No se detectaron cámaras en este dispositivo.");
+                }
+            }).catch(err => { 
+                alert("Error al solicitar acceso a la cámara."); 
+                document.getElementById('btn-activar').style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

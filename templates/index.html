@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Asistencias</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>CONTROL DE ASISTENCIAS</h1>
+            <p>Seleccione su perfil para continuar</p>
+            <a href="/login" class="btn btn-primary">Portal de Alumnos</a>
+            <a href="/docente/login" class="btn btn-outline">Portal de Docentes / Orientación</a>
+            <a href="/admin/login" class="btn btn-subtle">Escáner Administrador</a>
+        </div>
+    </div>
+</body>
+</html>

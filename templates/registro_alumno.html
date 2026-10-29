@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Alumnos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>REGISTRO DE ALUMNO</h2>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}{% for message in messages %}<div class="flash-error">{{ message }}</div>{% endfor %}{% endif %}
+            {% endwith %}
+            <form action="/registro" method="POST">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" name="nombre" required placeholder="Tu Nombre">
+                </div>
+                <div class="form-group">
+                    <label>Número de Control</label>
+                    <input type="text" name="matricula" required placeholder="Ej. 30501">
+                </div>
+                <div class="form-group">
+                    <label>Grupo</label>
+                    <select name="grupo" required>
+                        <option value="" disabled selected>Seleccione su grupo</option>
+                        {% for g in grupos %}
+                            <option value="{{ g }}">Grupo {{ g }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Número de Lista</label>
+                    <input type="number" name="numero_lista" min="1" max="50" required placeholder="Ej. 1">
+                </div>
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" name="correo" required placeholder="correo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+            </form>
+            <div class="link-text">¿Ya tienes cuenta? <a href="/login">Inicia sesión</a></div>
+        </div>
+    </div>
+</body>
+</html>

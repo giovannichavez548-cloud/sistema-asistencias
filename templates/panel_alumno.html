@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credencial Digital - Alumno</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>CREDENCIAL DIGITAL</h2>
+            <div class="info-box">
+                <p><strong>Nombre:</strong> {{ alumno.nombre }}</p>
+                <p><strong>Número de Control:</strong> {{ alumno.matricula }}</p>
+                <p><strong>Grupo:</strong> {{ alumno.grupo }}</p>
+                <p><strong>N° de Lista:</strong> {{ alumno.numero_lista }}</p>
+                <p><strong>Correo:</strong> {{ alumno.correo }}</p>
+            </div>
+            
+            <p style="color: #a39e93; font-size: 13px; margin-bottom: 15px;">Muestre este código QR al administrador para registrar su asistencia:</p>
+            <div class="qr-box">
+                <img src="data:image/png;base64,{{ qr_code }}" alt="Código QR de la Credencial">
+            </div>
+            <br>
+            <a href="/logout" class="back-link" style="margin-top: 25px; display: block; color: #e8a4a4;">Cerrar Sesión</a>
+        </div>
+    </div>
+</body>
+</html>
